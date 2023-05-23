@@ -5,6 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
 from selenium.webdriver.common.alert import Alert
+from selenium.webdriver.chrome.options import Options
+import datetime
 
 # function to open browser and navigate to a URL
 def open_browser_to_link(url):
@@ -19,30 +21,62 @@ def open_browser_to_link(url):
     # return the driver instance
     return driver
 
+def open_browser_incognito(url):
+    service = Service("D:/Selenium Framework/Constants/Driver/chromedriver.exe")
+    chrome_options = Options()
+    chrome_options.add_argument("--incognito")
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.maximize_window()
+    driver.get(url)
+    return driver
+
+def open_browser(url, incognito=False, headless=False):
+    service = Service("D:/Selenium Framework/Constants/Driver/chromedriver.exe")
+    chrome_options = Options()
+    if incognito:
+        chrome_options.add_argument("--incognito")
+    
+    if headless:
+        chrome_options.add_argument("--headless")
+    
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver.maximize_window()
+    driver.get(url)
+    return driver
+
 # function to click an element identified by XPATH
 def click_element(driver, xpath):
     # set a wait period of 10 seconds for the element to be clickable
-    wait = WebDriverWait(driver, 10)
+    #wait = WebDriverWait(driver, 10)
     # get the element identified by the XPATH
-    element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+    #element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+    
+    wait_until_element_is_clickable(driver, xpath, wait_time=10)
+    element = driver.find_element(By.XPATH, xpath)
     # click the element
     element.click()
 
 # function to enter text in an element identified by XPATH
 def enter_text_in_element(driver, xpath, text):
     # set a wait period of 10 seconds for the element to be clickable
-    wait = WebDriverWait(driver, 10)
+    #wait = WebDriverWait(driver, 10)
     # get the element identified by the XPATH
-    element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+    #element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+    
+    wait_until_element_is_visible(driver, xpath, wait_time=10)
+    element = driver.find_element(By.XPATH, xpath)
     # enter the provided text into the element
     element.send_keys(text)
 
 # function to get the text of an element identified by XPATH
 def get_element_text(driver, xpath):
     # set a wait period of 10 seconds for the element to be clickable
-    wait = WebDriverWait(driver, 10)
+    #wait = WebDriverWait(driver, 10)
     # get the element identified by the XPATH
-    element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+    #element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+
+    wait_until_element_is_visible(driver, xpath, wait_time=10)
+    element = driver.find_element(By.XPATH, xpath)
     # return the text of the element
     return element.text
 
@@ -51,6 +85,8 @@ def scroll_element_into_view(driver, xpath):
     # find the element identified by the XPATH
     # wait = WebDriverWait(driver, 10)
     # element = wait.until(EC._element_if_visible((By.XPATH, xpath))) -> element = driver.find_element(By.XPATH, xpath)
+    
+    wait_until_element_is_visible(driver,xpath, wait_time=10)
     element = driver.find_element(By.XPATH, xpath)
     # scroll the element into view using JavaScript
     driver.execute_script("arguments[0].scrollIntoView();", element)
@@ -58,10 +94,13 @@ def scroll_element_into_view(driver, xpath):
 # function to select a value from a dropdown identified by XPATH
 def select_value_in_dropdown(driver, xpath, value):
     # set a wait period of 10 seconds for the element to be clickable
-    wait = WebDriverWait(driver, 10)
+    #wait = WebDriverWait(driver, 10)
     # get the element identified by the XPATH
-    element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
-     # create a Select object for the dropdown element
+    #element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+    
+    wait_until_element_is_visible(driver,xpath, wait_time=10)
+    element = driver.find_element(By.XPATH, xpath)
+    # create a Select object for the dropdown element
     dropdown = Select(element)
     # select the provided value from the dropdown
     dropdown.select_by_value(value)
@@ -80,10 +119,10 @@ def handle_alert(driver, accept=True):
     # return the text of the popup message
     return alert_text_message
 
-# function to wait for an element identified by XPATH to be visible
+# function to wait for an element identified by XPATH to be visible - "explicit wait time"
 def wait_until_element_is_visible(driver, xpath, wait_time=10):
     # set a wait period of 10 seconds for the element to be visible
-    wait = WebDriverWait(driver, 10)
+    wait = WebDriverWait(driver, wait_time)
     try:
         # waiting for the element to be visible within given wait time
         element = wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
@@ -92,4 +131,27 @@ def wait_until_element_is_visible(driver, xpath, wait_time=10):
             return f"Element found: {xpath}."
     except Exception as e:
         # if element is not found, returning the element not found message
-        print(f"{e}: Element not found: {xpath}.") 
+        print(f"{e}: Element not found: {xpath}.")
+        take_screenshot(driver)
+
+# function to wait for an element identified by XPATH to be clickable - "explicit wait time"
+def wait_until_element_is_clickable(driver, xpath, wait_time=10):
+    # set a wait period of 10 seconds for the element to be visible
+    wait = WebDriverWait(driver, wait_time)
+    try:
+        # waiting for the element to be clickable within given wait time
+        element = wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+        # if element is found, returning the element found message
+        if element:
+            return f"Element found: {xpath}."
+    except Exception as e:
+        # if element is not found, returning the element not found message
+        print(f"{e}: Element not found: {xpath}.")
+        take_screenshot(driver)
+
+
+def take_screenshot(driver, filename=None):
+    file_name_ext = filename if filename else datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".png"
+    screenshot_data = driver.get_screenshot_as_png()
+    with open(file_name_ext, 'wb') as file:
+        file.write(screenshot_data)

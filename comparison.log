@@ -1,0 +1,6 @@
+2023-05-23 03:34:31,174 - root - INFO - Assertion passed, string [This is a link] contains [link].
+2023-05-23 03:34:31,335 - root - ERROR - : Assertion failed, string [This is a link[] does not contains [topgrep].
+2023-05-23 03:46:03,926 - root - INFO - Assertion passed, string [This is a link] contains [link].
+2023-05-23 03:46:03,971 - root - ERROR - : Assertion failed, string [This is a link[] does not contains [topgrep].
+2023-05-23 03:47:11,963 - root - INFO - Assertion passed, string [This is a link] contains [link].
+2023-05-23 03:47:12,004 - root - ERROR - : Assertion failed, string [This is a link[] does not contains [topgrep].
