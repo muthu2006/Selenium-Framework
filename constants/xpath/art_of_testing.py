@@ -1,0 +1,7 @@
+btn_gen_alert_box = "//button[contains(text(), 'Generate Alert Box')]"
+# btn_submit = "//button[@type='button']"
+btn_submit = "//button[@id='idOfButton']"
+txt_box = "//input[@type='text']"
+h2_useful_resources = "//h2[contains(text(), 'Useful Resources')]"
+#drop_down = "//select[contains(@id, 'testingDropdown')]"
+drop_down = "//select[@id='testingDropdown']"
